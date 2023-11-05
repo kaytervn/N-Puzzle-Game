@@ -354,6 +354,47 @@ def run_game(ROW, COL):
                     )
         return None
 
+    def IDA_solve(puzzle):
+        global total_nodes
+        total_nodes = 0
+        threshold = comparator(puzzle)
+
+        def dls(puzzle, threshold):
+            global total_nodes
+            start_node = tuple(puzzle)
+            stack = [(start_node, [], 0)]
+            visited = set()
+            min_cost = float("inf")
+
+            while stack:
+                current_node, path, g_value = stack.pop()
+                f_value = g_value + comparator(current_node)
+
+                if f_value > threshold:
+                    min_cost = min(min_cost, f_value)
+                    continue
+
+                if is_solved(list(current_node)):
+                    return path, float("inf")
+
+                for item in possible_moves(current_node):
+                    node, pos_move = item
+                    if tuple(node) not in visited:
+                        total_nodes += 1
+                        visited.add(tuple(node))
+                        new_path = path + [pos_move]
+                        stack.append((node, new_path, g_value + 1))
+
+            return None, min_cost
+
+        while True:
+            result, new_threshold = dls(puzzle, threshold)
+            if result is not None:
+                return result
+            if new_threshold == float("inf"):
+                return None
+            threshold = new_threshold
+
     def bidirectional_solve(puzzle):
         global total_nodes
         total_nodes = 0
@@ -397,7 +438,7 @@ def run_game(ROW, COL):
             str(total_nodes),
             str(depth_limit) if algorithm_combobox.get() in ["DFS", "IDFS"] else "",
             str(heuristic_rb.get())
-            if algorithm_combobox.get() in ["A*", "Greedy"]
+            if algorithm_combobox.get() in ["A*", "IDA*", "Greedy"]
             else "",
         ]
 
@@ -497,7 +538,11 @@ def run_game(ROW, COL):
             spinbox.grid(row=3, column=3, padx=5, pady=5)
             apply_button.grid(row=3, column=4, padx=5, pady=5, columnspan=2)
 
-        elif selected_value == "A*" or selected_value == "Greedy":
+        elif (
+            selected_value == "A*"
+            or selected_value == "IDA*"
+            or selected_value == "Greedy"
+        ):
             hamming_rb.grid(row=3, column=3, padx=5, pady=5)
             manhattan_rb.grid(row=3, column=2, padx=5, pady=5)
             linear_conflict_rb.grid(row=3, column=4, padx=5, pady=5, columnspan=2)
@@ -518,6 +563,7 @@ def run_game(ROW, COL):
             "UCS": ucs_solve,
             "Greedy": greedy_solve,
             "A*": A_solve,
+            "IDA*": IDA_solve,
             "BS": bidirectional_solve,
         }
         selected_algorithm = algorithm_combobox.get()
@@ -636,7 +682,7 @@ def run_game(ROW, COL):
     )
     game_label.grid(row=0, column=0, columnspan=window.winfo_screenwidth(), pady=10)
 
-    header_labels = ["Total Steps", "Step", "Solving", "Total Nodes"]
+    header_labels = ["Total Steps", "Step", "Solving", "Nodes"]
     for col, label_text in enumerate(header_labels):
         header_label = tk.Label(frame1, text=label_text, font=("Helvetica", 20, "bold"))
         header_label.grid(row=1, column=col, padx=30, pady=10)
@@ -655,7 +701,7 @@ def run_game(ROW, COL):
     total_nodes_label.grid(row=2, column=3, pady=10)
 
     depth_limit_header_label = tk.Label(
-        frame1, text="Depth Limit", font=("Helvetica", 20, "bold")
+        frame1, text="Depth", font=("Helvetica", 20, "bold")
     )
     depth_limit_label = tk.Label(frame1, text="0", font=("Helvetica", 20))
 
@@ -724,7 +770,7 @@ def run_game(ROW, COL):
 
     algorithm_combobox = ttk.Combobox(
         frame2,
-        values=["BFS", "DFS", "DLS", "IDFS", "UCS", "Greedy", "A*", "BS"],
+        values=["BFS", "DFS", "DLS", "IDFS", "UCS", "Greedy", "A*", "IDA*", "BS"],
     )
     algorithm_combobox.configure(width=10, font=("Helvetica", 20))
     algorithm_combobox.set("BFS")
