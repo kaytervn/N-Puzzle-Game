@@ -225,7 +225,7 @@ def run_game(ROW, COL):
                     stack.append((node, new_path, depth + 1))
         return None
 
-    def idfs_solve(puzzle):
+    def iddfs_solve(puzzle):
         global depth_limit
         depth_limit = 1
         result = dls_solve(puzzle, depth_limit)
@@ -436,7 +436,7 @@ def run_game(ROW, COL):
             f"{solving_time:.2f}s",
             str(step_count),
             str(total_nodes),
-            str(depth_limit) if algorithm_combobox.get() in ["DFS", "IDFS"] else "",
+            str(depth_limit) if algorithm_combobox.get() in ["DLS", "IDDFS"] else "",
             str(heuristic_rb.get())
             if algorithm_combobox.get() in ["A*", "IDA*", "Greedy"]
             else "",
@@ -523,7 +523,7 @@ def run_game(ROW, COL):
         manhattan_rb.grid_forget()
         linear_conflict_rb.grid_forget()
 
-        if selected_value == "IDFS":
+        if selected_value == "IDDFS":
             depth_limit = 1
             depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
             depth_limit_label.grid(row=2, column=4, pady=10)
@@ -559,7 +559,7 @@ def run_game(ROW, COL):
             "BFS": bfs_solve,
             "DFS": dfs_solve,
             "DLS": lambda puzzle: dls_solve(puzzle, depth_limit),
-            "IDFS": idfs_solve,
+            "IDDFS": iddfs_solve,
             "UCS": ucs_solve,
             "Greedy": greedy_solve,
             "A*": A_solve,
@@ -770,7 +770,7 @@ def run_game(ROW, COL):
 
     algorithm_combobox = ttk.Combobox(
         frame2,
-        values=["BFS", "DFS", "DLS", "IDFS", "UCS", "Greedy", "A*", "IDA*", "BS"],
+        values=["BFS", "DFS", "DLS", "IDDFS", "UCS", "Greedy", "A*", "IDA*", "BS"],
     )
     algorithm_combobox.configure(width=10, font=("Helvetica", 20))
     algorithm_combobox.set("BFS")
