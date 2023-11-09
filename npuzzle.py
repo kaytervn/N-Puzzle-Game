@@ -550,7 +550,7 @@ def run_game(ROW, COL):
         update_infor_lables()
 
     def run_algorithm():
-        global stop_event, thread_count, solving_time, step_count, total_steps, speed
+        global stop_event, thread_count, solving_time, step_count, total_steps, speed, puzzle
         speed = 0.2
         reset_infor_lables()
         update_solving_time(solving_time)
@@ -583,6 +583,12 @@ def run_game(ROW, COL):
             update_total_steps_count(total_steps)
             skip_btn.config(state=tk.NORMAL)
             for move_to in solution:
+                if step_count > 100 and speed == 0:
+                    puzzle = list(goal)
+                    step_count = total_steps
+                    update_display()
+                    update_step_count(step_count)
+                    break
                 move(puzzle, move_to)
                 step_count += 1
                 update_step_count(step_count)
