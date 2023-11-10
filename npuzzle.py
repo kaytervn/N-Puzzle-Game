@@ -428,8 +428,40 @@ def run_game(ROW, COL):
 
         return None
 
+    def hc_solve(puzzle):
+        global total_nodes
+        total_nodes = 0
+
+        current_node = list(puzzle)
+        current_cost = comparator(current_node)
+        path = []
+
+        while True:
+            neighbors = possible_moves(current_node)
+            random.shuffle(neighbors)
+            found_better_neighbor = False
+
+            for neighbor, move in neighbors:
+                neighbor_cost = comparator(neighbor)
+                if neighbor_cost < current_cost:
+                    current_node = neighbor
+                    current_cost = neighbor_cost
+                    found_better_neighbor = True
+                    total_nodes += 1
+                    path.append(move)
+                    break
+
+            if not found_better_neighbor:
+                break
+
+        return path
+
     def add_record():
         global record_row
+        if not is_solved(puzzle):
+            color = "red"
+        else:
+            color = "black"
 
         labels_data = [
             algorithm_combobox.get(),
@@ -444,7 +476,10 @@ def run_game(ROW, COL):
 
         for col, data in enumerate(labels_data):
             record_label = tk.Label(
-                inner_frame, text=data, font=("Helvetica", 12, "italic")
+                inner_frame,
+                text=data,
+                font=("Helvetica", 12, "italic"),
+                fg=color,
             )
             record_label.grid(row=record_row, column=col)
         record_row += 1
@@ -564,7 +599,8 @@ def run_game(ROW, COL):
             "Greedy": greedy_solve,
             "A*": A_solve,
             "IDA*": IDA_solve,
-            "BS": bidirectional_solve,
+            "Bi-Search": bidirectional_solve,
+            "Hill Climbing": hc_solve,
         }
         selected_algorithm = algorithm_combobox.get()
         start_time = time.time()
@@ -770,13 +806,24 @@ def run_game(ROW, COL):
 
     # Control Buttons - Combobox
     algorithm_label = tk.Label(
-        frame2, text="Algorithms:", font=("Helvetica", 20, "bold")
+        frame2, text="Algorithm:", font=("Helvetica", 20, "bold")
     )
     algorithm_label.grid(row=4, column=2, padx=5, pady=5)
 
     algorithm_combobox = ttk.Combobox(
         frame2,
-        values=["BFS", "DFS", "DLS", "IDDFS", "UCS", "Greedy", "A*", "IDA*", "BS"],
+        values=[
+            "BFS",
+            "DFS",
+            "DLS",
+            "IDDFS",
+            "UCS",
+            "Greedy",
+            "A*",
+            "IDA*",
+            "Bi-Search",
+            "Hill Climbing",
+        ],
     )
     algorithm_combobox.configure(width=10, font=("Helvetica", 20))
     algorithm_combobox.set("BFS")
