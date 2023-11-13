@@ -470,7 +470,7 @@ def run_game(ROW, COL):
             str(total_nodes),
             str(depth_limit) if algorithm_combobox.get() in ["DLS", "IDDFS"] else "",
             str(heuristic_rb.get())
-            if algorithm_combobox.get() in ["A*", "IDA*", "Greedy"]
+            if algorithm_combobox.get() in ["A*", "IDA*", "Greedy", "Hill Climbing"]
             else "",
         ]
 
@@ -577,6 +577,7 @@ def run_game(ROW, COL):
             selected_value == "A*"
             or selected_value == "IDA*"
             or selected_value == "Greedy"
+            or selected_value == "Hill Climbing"
         ):
             hamming_rb.grid(row=3, column=3, padx=5, pady=5)
             manhattan_rb.grid(row=3, column=2, padx=5, pady=5)
