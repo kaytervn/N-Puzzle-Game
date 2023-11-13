@@ -619,13 +619,16 @@ def run_game(ROW, COL):
             total_steps = len(solution)
             update_total_steps_count(total_steps)
             skip_btn.config(state=tk.NORMAL)
+            step = 0
             for move_to in solution:
-                if step_count > 100 and speed == 0:
-                    puzzle = list(goal)
-                    step_count = total_steps
-                    update_display()
-                    update_step_count(step_count)
-                    break
+                if speed == 0:
+                    step += 1
+                    if step > 50:
+                        puzzle = list(goal)
+                        step_count = total_steps
+                        update_display()
+                        update_step_count(step_count)
+                        break
                 move(puzzle, move_to)
                 step_count += 1
                 update_step_count(step_count)
