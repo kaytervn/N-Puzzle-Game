@@ -55,8 +55,6 @@ def run_game(ROW, COL):
             puzzle[empty_index] = move_to
             puzzle[move_index] = 0
 
-            update_display()
-
     def update_display():
         for i in range(ROW):
             for j in range(COL):
@@ -75,10 +73,12 @@ def run_game(ROW, COL):
                         image=photo,
                     )
                 button.config(state=tk.NORMAL if value else tk.DISABLED)
+        window.update()
 
     def on_button_click(row, col):
         move_to = puzzle[row * COL + col]
         move(puzzle, move_to)
+        update_display()
 
     def on_key_press(event):
         zero_index = puzzle.index(0)
@@ -96,6 +96,7 @@ def run_game(ROW, COL):
             return
 
         move(puzzle, move_to)
+        update_display()
 
     def possible_moves(current_node):
         moves = []
@@ -129,15 +130,15 @@ def run_game(ROW, COL):
                     move(puzzle, pos_move)
                     visited.add(tuple(node))
             count += 1
+        update_display()
 
     def update_infor_lables():
         update_total_nodes_count(total_nodes)
         update_step_count(step_count)
         update_total_steps_count(total_steps)
-        if algorithm_combobox.get() == "Hill Climbing":
-            update_depth_limit_count(shuffling_count)
-        else:
-            update_depth_limit_count(depth_limit)
+        update_shuffling_count(shuffling_count)
+        update_depth_limit_count(depth_limit)
+        window.update()
 
     def reset_infor_lables():
         global total_nodes, step_count, total_steps, solving_time, depth_limit
@@ -170,6 +171,9 @@ def run_game(ROW, COL):
 
     def update_solving_time(count):
         time_label.config(text=f"{count:.2f}s")
+
+    def update_shuffling_count(count):
+        shuffling_count_label.config(text=f"{count}")
 
     def bfs_solve(puzzle):
         global total_nodes
@@ -469,7 +473,6 @@ def run_game(ROW, COL):
         path = hc_solve(puzzle)
         while not path and not stop:
             random_shuffle(puzzle)
-            window.update()
             shuffling_count += 1
             path = hc_solve(puzzle)
         return path
@@ -514,11 +517,8 @@ def run_game(ROW, COL):
             f"{solving_time:.2f}s",
             str(step_count),
             str(total_nodes),
-            str(depth_limit)
-            if algorithm_combobox.get() in ["DLS", "IDDFS"]
-            else str(shuffling_count)
-            if algorithm_combobox.get() == "Hill Climbing"
-            else "",
+            str(depth_limit) if algorithm_combobox.get() in ["DLS", "IDDFS"] else "",
+            str(shuffling_count) if algorithm_combobox.get() == "Hill Climbing" else "",
             str(heuristic_rb.get())
             if algorithm_combobox.get()
             in ["A*", "IDA*", "Greedy", "Hill Climbing", "Beam Search"]
@@ -536,6 +536,7 @@ def run_game(ROW, COL):
         record_row += 1
         inner_frame.update_idletasks()
         canvas.config(scrollregion=canvas.bbox("all"))
+        window.update()
 
     def disable_controls():
         global stop
@@ -557,6 +558,7 @@ def run_game(ROW, COL):
 
         for button in control_buttons:
             button.config(state=tk.DISABLED)
+        window.update()
 
     def enable_controls():
         global stop
@@ -580,6 +582,7 @@ def run_game(ROW, COL):
 
         for button in control_buttons:
             button.config(state=tk.NORMAL)
+        window.update()
 
     def validate_depth():
         try:
@@ -604,13 +607,15 @@ def run_game(ROW, COL):
         update_infor_lables()
 
     def on_combobox_change(event):
-        global depth_limit
+        global depth_limit, shuffling_count
         selected_value = algorithm_combobox.get()
         reset_infor_lables()
         update_solving_time(solving_time)
 
         depth_limit_header_label.grid_forget()
         depth_limit_label.grid_forget()
+        shuffling_count_header_label.grid_forget()
+        shuffling_count_label.grid_forget()
         optional_label.grid_forget()
         apply_button.grid_forget()
         spinbox.grid_forget()
@@ -621,14 +626,12 @@ def run_game(ROW, COL):
 
         if selected_value == "IDDFS":
             depth_limit = 1
-            depth_limit_header_label.config(text="Depth")
             depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
             depth_limit_label.grid(row=2, column=4, pady=10)
 
         elif selected_value == "DLS":
             validate_depth()
             depth_limit = int(spinbox.get())
-            depth_limit_header_label.config(text="Depth")
             depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
             depth_limit_label.grid(row=2, column=4, pady=10)
             optional_label.grid(row=3, column=3, padx=5, pady=5)
@@ -648,9 +651,9 @@ def run_game(ROW, COL):
             linear_conflict_rb.grid(row=3, column=5, padx=5, pady=5)
             misplaced_tiles_rb.grid(row=3, column=4, padx=5, pady=5)
             if selected_value == "Hill Climbing":
-                depth_limit_header_label.config(text="Shuffling")
-                depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
-                depth_limit_label.grid(row=2, column=4, pady=10)
+                shuffling_count = 0
+                shuffling_count_header_label.grid(row=1, column=4, padx=30, pady=10)
+                shuffling_count_label.grid(row=2, column=4, pady=10)
 
         update_infor_lables()
 
@@ -702,9 +705,9 @@ def run_game(ROW, COL):
                         update_step_count(step_count)
                         break
                 move(puzzle, move_to)
+                update_display()
                 step_count += 1
                 update_step_count(step_count)
-                window.update()
                 time.sleep(speed)
         else:
             total_steps = 0
@@ -725,13 +728,14 @@ def run_game(ROW, COL):
                 )
                 puzzle_pieces.append(ImageTk.PhotoImage(cropped_image))
         image_mapping = dict(zip(list(range(0, ROW * COL)), puzzle_pieces))
+        window.update()
 
     def upload_image():
         file_path = filedialog.askopenfilename()
         if file_path:
             puzzle_image = Image.open(file_path).resize((COL * SIZE, ROW * SIZE))
             map_image(puzzle_image)
-            photo = ImageTk.PhotoImage(Image.open(file_path).resize((150, 150)))
+            photo = ImageTk.PhotoImage(Image.open(file_path).resize((170, 170)))
             image_label.config(image=photo)
             image_label.image = photo
             update_display()
@@ -753,6 +757,7 @@ def run_game(ROW, COL):
         global stop
         stop_btn.config(state=tk.DISABLED)
         stop = True
+        window.update()
 
     def btn_export_click():
         global puzzle
@@ -787,7 +792,6 @@ def run_game(ROW, COL):
         reset_infor_lables()
         update_solving_time(solving_time)
         random_shuffle(puzzle)
-        window.update()
 
     window = tk.Tk()
     window.bind("<KeyPress>", on_key_press)
@@ -828,6 +832,11 @@ def run_game(ROW, COL):
         frame1, text="Depth", font=("Helvetica", 20, "bold")
     )
     depth_limit_label = tk.Label(frame1, text="0", font=("Helvetica", 20))
+
+    shuffling_count_header_label = tk.Label(
+        frame1, text="Shuffling", font=("Helvetica", 20, "bold")
+    )
+    shuffling_count_label = tk.Label(frame1, text="0", font=("Helvetica", 20))
 
     frame2 = tk.Frame(frame)
     frame2.grid(row=5, column=0, pady=10, columnspan=window.winfo_screenwidth())
@@ -1003,14 +1012,14 @@ def run_game(ROW, COL):
 
     label_frame = tk.LabelFrame(
         frame,
-        text="   Algorithm           Solving           Steps           Nodes           Depth/ Shuffling           Heuristic",
+        text="   Algorithm           Solving           Steps           Nodes           Depth           Shuffling           Heuristic",
         font=("Helvetica", 15, "bold"),
         borderwidth=0,
         highlightthickness=0,
     )
     label_frame.grid(row=record_row - 1, column=0, sticky="ew")
 
-    canvas = tk.Canvas(label_frame, width=900, height=130)
+    canvas = tk.Canvas(label_frame, width=950, height=130)
     canvas.grid(row=0, column=0)
 
     # Create a Scrollbar widget
@@ -1029,7 +1038,8 @@ def run_game(ROW, COL):
         "Solving",
         "Steps",
         "Nodes",
-        "Depth/ Shuffling",
+        "Depth",
+        "Shuffling",
         "Heuristic",
     ]
     for col, label_text in enumerate(header_labels):
