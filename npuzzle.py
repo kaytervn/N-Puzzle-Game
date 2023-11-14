@@ -15,12 +15,13 @@ from collections import deque
 
 
 global ROW, COL, image_mapping
-
 step_count = 0
 total_steps = 0
 total_nodes = 0
 solving_time = 0
+shuffling_count = 0
 depth_limit = 1
+stop = False
 speed = 0.2
 buttons = []
 
@@ -132,8 +133,11 @@ def run_game(ROW, COL):
     def update_infor_lables():
         update_total_nodes_count(total_nodes)
         update_step_count(step_count)
-        update_depth_limit_count(depth_limit)
         update_total_steps_count(total_steps)
+        if algorithm_combobox.get() == "Hill Climbing":
+            update_depth_limit_count(shuffling_count)
+        else:
+            update_depth_limit_count(depth_limit)
 
     def reset_infor_lables():
         global total_nodes, step_count, total_steps, solving_time, depth_limit
@@ -173,7 +177,7 @@ def run_game(ROW, COL):
         visited = set()
         start_node = tuple(puzzle)
         queue = deque([(start_node, [])])
-        while queue:
+        while queue and not stop:
             current_node, path = queue.popleft()
             for item in possible_moves(current_node):
                 node, pos_move = item
@@ -187,12 +191,12 @@ def run_game(ROW, COL):
         return None
 
     def dfs_solve(puzzle):
-        global total_nodes
+        global total_nodes, stop
         total_nodes = 0
         start_node = tuple(puzzle)
         stack = [(start_node, [])]
         visited = set()
-        while stack:
+        while stack and not stop:
             current_node, path = stack.pop()
             for item in possible_moves(current_node):
                 node, pos_move = item
@@ -210,7 +214,7 @@ def run_game(ROW, COL):
         start_node = tuple(puzzle)
         stack = [(start_node, [], 0)]
         visited = set()
-        while stack:
+        while stack and not stop:
             current_node, path, depth = stack.pop()
             if is_solved(list(current_node)):
                 return path
@@ -229,7 +233,7 @@ def run_game(ROW, COL):
         global depth_limit
         depth_limit = 1
         result = dls_solve(puzzle, depth_limit)
-        while not result:
+        while not result and not stop:
             depth_limit += 1
             result = dls_solve(puzzle, depth_limit)
         return result
@@ -241,7 +245,7 @@ def run_game(ROW, COL):
         visited = set()
         start_node = tuple(puzzle)
         priority_queue.put((0, start_node, []))
-        while not priority_queue.empty():
+        while not priority_queue.empty() and not stop:
             cost, current_node, path = priority_queue.get()
             for item in possible_moves(current_node):
                 node, pos_move = item
@@ -298,13 +302,22 @@ def run_game(ROW, COL):
                         )
         return conflicts * 2
 
+    def misplaced_tiles(puzzle):
+        count = 0
+        for i in range(0, len(puzzle)):
+            if puzzle[i] != i:
+                count += 1
+        return count
+
     def comparator(puzzle):
         if heuristic_rb.get() == "manhattan":
             return manhattan_distance(puzzle)
         elif heuristic_rb.get() == "hamming":
             return hamming_distance(puzzle)
-        else:
+        elif heuristic_rb.get() == "linear conflict":
             return linear_conflict(puzzle)
+        else:
+            return misplaced_tiles(puzzle)
 
     def greedy_solve(puzzle):
         global total_nodes
@@ -313,7 +326,7 @@ def run_game(ROW, COL):
         visited = set()
         start_node = tuple(puzzle)
         priority_queue.put((0, start_node, []))
-        while not priority_queue.empty():
+        while not priority_queue.empty() and not stop:
             _, current_node, path = priority_queue.get()
             for item in possible_moves(current_node):
                 node, pos_move = item
@@ -332,7 +345,7 @@ def run_game(ROW, COL):
         total_nodes = 0
         priority_queue = [(comparator(puzzle), 0, tuple(puzzle), [])]
         visited = set()
-        while priority_queue:
+        while priority_queue and not stop:
             _, g_value, current_node, path = heapq.heappop(priority_queue)
             for item in possible_moves(current_node):
                 node, pos_move = item
@@ -366,7 +379,7 @@ def run_game(ROW, COL):
             visited = set()
             min_cost = float("inf")
 
-            while stack:
+            while stack and not stop:
                 current_node, path, g_value = stack.pop()
                 f_value = g_value + comparator(current_node)
 
@@ -387,7 +400,7 @@ def run_game(ROW, COL):
 
             return None, min_cost
 
-        while True:
+        while not stop:
             result, new_threshold = dls(puzzle, threshold)
             if result is not None:
                 return result
@@ -403,7 +416,7 @@ def run_game(ROW, COL):
         forward_visited = set()
         backward_visited = {}
 
-        while forward_open and backward_open:
+        while forward_open and backward_open and not stop:
             forward_state, forward_path = forward_open.popleft()
             backward_state, backward_path = backward_open.popleft()
 
@@ -431,30 +444,62 @@ def run_game(ROW, COL):
     def hc_solve(puzzle):
         global total_nodes
         total_nodes = 0
-
-        current_node = list(puzzle)
-        current_cost = comparator(current_node)
-        path = []
-
-        while True:
-            neighbors = possible_moves(current_node)
-            random.shuffle(neighbors)
-            found_better_neighbor = False
-
-            for neighbor, move in neighbors:
-                neighbor_cost = comparator(neighbor)
-                if neighbor_cost < current_cost:
-                    current_node = neighbor
-                    current_cost = neighbor_cost
-                    found_better_neighbor = True
+        start_node = tuple(puzzle)
+        queue = deque([(start_node, [])])
+        while queue and not stop:
+            current_node, path = queue.popleft()
+            node, pos_move = possible_moves(current_node)[0]
+            cost = comparator(node)
+            for i in range(1, len(possible_moves(current_node))):
+                if cost >= comparator(node):
+                    cost = comparator(node)
+                    node, pos_move = possible_moves(current_node)[i]
                     total_nodes += 1
-                    path.append(move)
-                    break
+                else:
+                    return None
+            new_path = path + [pos_move]
+            if is_solved(list(node)):
+                return new_path
+            queue.append((node, new_path))
+        return None
 
-            if not found_better_neighbor:
-                break
-        if is_solved(current_node):
-            return path
+    def hc_loop(puzzle):
+        global shuffling_count
+        shuffling_count = 0
+        path = hc_solve(puzzle)
+        while not path and not stop:
+            random_shuffle(puzzle)
+            window.update()
+            shuffling_count += 1
+            path = hc_solve(puzzle)
+        return path
+
+    def beam_solve(puzzle):
+        global total_nodes
+        total_nodes = 0
+        visited = set()
+        start_node = tuple(puzzle)
+        queue1 = deque([(start_node, [])])
+        while queue1 and not stop:
+            current_node, path = queue1.popleft()
+            k = random.randint(2, len(possible_moves(current_node)))
+            top_k_elements = []
+            priority_queue = queue.PriorityQueue()
+            for item in possible_moves(current_node):
+                node, pos_move = item
+                priority_queue.put((comparator(node), node, pos_move))
+            for _ in range(k):
+                if not priority_queue.empty():
+                    top_k_elements.append(priority_queue.get())
+            for item in top_k_elements:
+                _, node, pos_move = item
+                if tuple(node) not in visited:
+                    visited.add(tuple(node))
+                    total_nodes += 1
+                    new_path = path + [pos_move]
+                    if is_solved(list(node)):
+                        return new_path
+                    queue1.append((node, new_path))
         return None
 
     def add_record():
@@ -469,9 +514,14 @@ def run_game(ROW, COL):
             f"{solving_time:.2f}s",
             str(step_count),
             str(total_nodes),
-            str(depth_limit) if algorithm_combobox.get() in ["DLS", "IDDFS"] else "",
+            str(depth_limit)
+            if algorithm_combobox.get() in ["DLS", "IDDFS"]
+            else str(shuffling_count)
+            if algorithm_combobox.get() == "Hill Climbing"
+            else "",
             str(heuristic_rb.get())
-            if algorithm_combobox.get() in ["A*", "IDA*", "Greedy", "Hill Climbing"]
+            if algorithm_combobox.get()
+            in ["A*", "IDA*", "Greedy", "Hill Climbing", "Beam Search"]
             else "",
         ]
 
@@ -488,14 +538,19 @@ def run_game(ROW, COL):
         canvas.config(scrollregion=canvas.bbox("all"))
 
     def disable_controls():
+        global stop
         widgets_to_disable = [
             spinbox,
             apply_button,
             hamming_rb,
             manhattan_rb,
             linear_conflict_rb,
+            misplaced_tiles_rb,
             algorithm_combobox,
         ]
+
+        stop_btn.config(state=tk.NORMAL)
+        stop = False
 
         for widget in widgets_to_disable:
             widget.config(state=tk.DISABLED)
@@ -504,16 +559,20 @@ def run_game(ROW, COL):
             button.config(state=tk.DISABLED)
 
     def enable_controls():
+        global stop
         widgets_to_disable = [
             spinbox,
             apply_button,
             hamming_rb,
             manhattan_rb,
             linear_conflict_rb,
+            misplaced_tiles_rb,
             algorithm_combobox,
         ]
 
         skip_btn.config(state=tk.DISABLED)
+        stop_btn.config(state=tk.DISABLED)
+        stop = False
 
         for widget in widgets_to_disable:
             widget.config(state=tk.NORMAL)
@@ -557,37 +616,46 @@ def run_game(ROW, COL):
         spinbox.grid_forget()
         hamming_rb.grid_forget()
         manhattan_rb.grid_forget()
+        misplaced_tiles_rb.grid_forget()
         linear_conflict_rb.grid_forget()
 
         if selected_value == "IDDFS":
             depth_limit = 1
+            depth_limit_header_label.config(text="Depth")
             depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
             depth_limit_label.grid(row=2, column=4, pady=10)
 
         elif selected_value == "DLS":
             validate_depth()
             depth_limit = int(spinbox.get())
+            depth_limit_header_label.config(text="Depth")
             depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
             depth_limit_label.grid(row=2, column=4, pady=10)
-            optional_label.grid(row=3, column=2, padx=5, pady=5)
+            optional_label.grid(row=3, column=3, padx=5, pady=5)
             optional_label.config(text="Depth Limit:")
-            spinbox.grid(row=3, column=3, padx=5, pady=5)
-            apply_button.grid(row=3, column=4, padx=5, pady=5, columnspan=2)
+            spinbox.grid(row=3, column=4, padx=5, pady=5)
+            apply_button.grid(row=3, column=5, padx=5, pady=5)
 
         elif (
             selected_value == "A*"
             or selected_value == "IDA*"
             or selected_value == "Greedy"
             or selected_value == "Hill Climbing"
+            or selected_value == "Beam Search"
         ):
-            hamming_rb.grid(row=3, column=3, padx=5, pady=5)
-            manhattan_rb.grid(row=3, column=2, padx=5, pady=5)
-            linear_conflict_rb.grid(row=3, column=4, padx=5, pady=5, columnspan=2)
+            hamming_rb.grid(row=3, column=6, padx=5, pady=5)
+            manhattan_rb.grid(row=3, column=3, padx=5, pady=5)
+            linear_conflict_rb.grid(row=3, column=5, padx=5, pady=5)
+            misplaced_tiles_rb.grid(row=3, column=4, padx=5, pady=5)
+            if selected_value == "Hill Climbing":
+                depth_limit_header_label.config(text="Shuffling")
+                depth_limit_header_label.grid(row=1, column=4, padx=30, pady=10)
+                depth_limit_label.grid(row=2, column=4, pady=10)
 
         update_infor_lables()
 
     def run_algorithm():
-        global stop_event, thread_count, solving_time, step_count, total_steps, speed, puzzle
+        global stop_event, thread_count, solving_time, step_count, total_steps, speed, puzzle, stop
         speed = 0.2
         reset_infor_lables()
         update_solving_time(solving_time)
@@ -602,7 +670,8 @@ def run_game(ROW, COL):
             "A*": A_solve,
             "IDA*": IDA_solve,
             "Bi-Search": bidirectional_solve,
-            "Hill Climbing": hc_solve,
+            "Hill Climbing": hc_loop,
+            "Beam Search": beam_solve,
         }
         selected_algorithm = algorithm_combobox.get()
         start_time = time.time()
@@ -620,6 +689,8 @@ def run_game(ROW, COL):
             total_steps = len(solution)
             update_total_steps_count(total_steps)
             skip_btn.config(state=tk.NORMAL)
+            stop_btn.config(state=tk.DISABLED)
+            stop = False
             step = 0
             for move_to in solution:
                 if speed == 0:
@@ -638,8 +709,9 @@ def run_game(ROW, COL):
         else:
             total_steps = 0
             update_total_steps_count(total_steps)
-            messagebox.showwarning("Warning", "There is no solution!")
+            messagebox.showwarning("Warning", "The process is ended!")
 
+        window.update()
         add_record()
         enable_controls()
 
@@ -676,6 +748,11 @@ def run_game(ROW, COL):
     def btn_skip_click():
         global speed
         speed = 0
+
+    def btn_stop_click():
+        global stop
+        stop_btn.config(state=tk.DISABLED)
+        stop = True
 
     def btn_export_click():
         global puzzle
@@ -762,10 +839,10 @@ def run_game(ROW, COL):
         bd=2,
         relief="solid",
     )
-    state_label.grid(row=3, column=0, columnspan=2, rowspan=2)
+    state_label.grid(row=3, column=1, columnspan=2, rowspan=2)
 
     image_label = tk.Label(frame2)
-    image_label.grid(row=3, column=6, rowspan=3)
+    image_label.grid(row=3, column=0, rowspan=3)
 
     optional_label = tk.Label(frame2, font=("Helvetica", 20, "bold"))
     spinbox = tk.Spinbox(
@@ -808,12 +885,19 @@ def run_game(ROW, COL):
         value="linear conflict",
         font=("Helvetica", 15),
     )
+    misplaced_tiles_rb = tk.Radiobutton(
+        frame2,
+        text="Misplaced Tiles",
+        variable=heuristic_rb,
+        value="misplaced tiles",
+        font=("Helvetica", 15),
+    )
 
     # Control Buttons - Combobox
     algorithm_label = tk.Label(
         frame2, text="Algorithm:", font=("Helvetica", 20, "bold")
     )
-    algorithm_label.grid(row=4, column=2, padx=5, pady=5)
+    algorithm_label.grid(row=4, column=3, padx=5, pady=5)
 
     algorithm_combobox = ttk.Combobox(
         frame2,
@@ -828,21 +912,22 @@ def run_game(ROW, COL):
             "IDA*",
             "Bi-Search",
             "Hill Climbing",
+            "Beam Search",
         ],
     )
-    algorithm_combobox.configure(width=10, font=("Helvetica", 20))
+    algorithm_combobox.configure(width=11, font=("Helvetica", 20), height=20)
     algorithm_combobox.set("BFS")
     algorithm_combobox.state(["readonly"])
     algorithm_combobox.bind("<<ComboboxSelected>>", on_combobox_change)
-    algorithm_combobox.grid(row=4, column=3, padx=5, pady=5)
+    algorithm_combobox.grid(row=4, column=4, padx=5, pady=5)
 
     buttons_data = [
-        ("Solve", 4, 4, btn_solve_click, "yellow", 7, 1),
-        ("Save", 5, 0, btn_save_click, "lightblue", 7, 1),
-        ("Export", 5, 1, btn_export_click, "lightblue", 7, 1),
-        ("Random", 5, 3, btn_random_click, "lime", 15, 1),
-        ("Change Size", 5, 2, restart_program, "orange", 15, 1),
-        ("Upload Image", 5, 4, upload_image, "pink", 15, 2),
+        ("Solve", 4, 5, btn_solve_click, "yellow", 15, 1),
+        ("Save", 5, 1, btn_save_click, "lightblue", 7, 1),
+        ("Export", 5, 2, btn_export_click, "lightblue", 7, 1),
+        ("Random", 5, 4, btn_random_click, "lime", 15, 1),
+        ("Change Size", 5, 3, restart_program, "orange", 15, 1),
+        ("Upload Image", 5, 5, upload_image, "pink", 15, 1),
     ]
 
     control_buttons = []
@@ -862,14 +947,27 @@ def run_game(ROW, COL):
     skip_btn = tk.Button(
         frame2,
         text="Skip",
-        width=7,
+        width=15,
         height=2,
         font=("Helvetica", 12, "bold"),
         command=btn_skip_click,
         bg="lightyellow",
         state=tk.DISABLED,
     )
-    skip_btn.grid(row=4, column=5, padx=5, pady=5)
+    skip_btn.grid(row=4, column=6, padx=5, pady=5)
+
+    stop_btn = tk.Button(
+        frame2,
+        text="Stop",
+        width=15,
+        height=2,
+        font=("Helvetica", 12, "bold"),
+        command=btn_stop_click,
+        bg="red",
+        state=tk.DISABLED,
+        fg="white",
+    )
+    stop_btn.grid(row=5, column=6, padx=5, pady=5)
 
     # Puzzle Buttons
     puzzle_frame = tk.Frame(frame)
@@ -905,14 +1003,14 @@ def run_game(ROW, COL):
 
     label_frame = tk.LabelFrame(
         frame,
-        text="   Algorithm           Solving           Steps           Nodes           Depth           Heuristic",
+        text="   Algorithm           Solving           Steps           Nodes           Depth/ Shuffling           Heuristic",
         font=("Helvetica", 15, "bold"),
         borderwidth=0,
         highlightthickness=0,
     )
     label_frame.grid(row=record_row - 1, column=0, sticky="ew")
 
-    canvas = tk.Canvas(label_frame, width=800, height=130)
+    canvas = tk.Canvas(label_frame, width=900, height=130)
     canvas.grid(row=0, column=0)
 
     # Create a Scrollbar widget
@@ -931,7 +1029,7 @@ def run_game(ROW, COL):
         "Solving",
         "Steps",
         "Nodes",
-        "Depth",
+        "Depth/ Shuffling",
         "Heuristic",
     ]
     for col, label_text in enumerate(header_labels):
