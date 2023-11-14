@@ -453,8 +453,9 @@ def run_game(ROW, COL):
 
             if not found_better_neighbor:
                 break
-
-        return path
+        if is_solved(current_node):
+            return path
+        return None
 
     def add_record():
         global record_row
