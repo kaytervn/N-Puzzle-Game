@@ -7,6 +7,7 @@ import heapq
 import threading
 import sys
 import os
+import math
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -505,6 +506,45 @@ def run_game(ROW, COL):
                     queue1.append((node, new_path))
         return None
 
+    def sa_solve(puzzle):
+        def acceptance_probability(cost, new_cost, temperature):
+            if new_cost < cost:
+                return 1.0
+            return math.exp((cost - new_cost) / temperature)
+
+        global total_nodes
+        total_nodes = 0
+        temperature = 1.0
+        cooling_rate = 0.99
+        current_state = tuple(puzzle)
+        path = []
+        while temperature > 0.01 and not stop:
+            neighbors = possible_moves(current_state)
+            next_state, move = random.choice(neighbors)
+            current_cost = comparator(current_state)
+            new_cost = comparator(next_state)
+            if (
+                acceptance_probability(current_cost, new_cost, temperature)
+                > random.random()
+            ):
+                total_nodes += 1
+                path.append(move)
+                current_state = next_state
+            if is_solved(list(current_state)):
+                return path
+            temperature *= cooling_rate
+        return None
+
+    def sa_loop(puzzle):
+        global shuffling_count
+        shuffling_count = 0
+        path = sa_solve(puzzle)
+        while not path and not stop:
+            random_shuffle(puzzle)
+            shuffling_count += 1
+            path = sa_solve(puzzle)
+        return path
+
     def add_record():
         global record_row
         if not is_solved(puzzle):
@@ -518,10 +558,19 @@ def run_game(ROW, COL):
             str(step_count),
             str(total_nodes),
             str(depth_limit) if algorithm_combobox.get() in ["DLS", "IDDFS"] else "",
-            str(shuffling_count) if algorithm_combobox.get() == "Hill Climbing" else "",
+            str(shuffling_count)
+            if algorithm_combobox.get() in ["Hill Climbing", "Sim-Annealing"]
+            else "",
             str(heuristic_rb.get())
             if algorithm_combobox.get()
-            in ["A*", "IDA*", "Greedy", "Hill Climbing", "Beam Search"]
+            in [
+                "A* Search",
+                "IDA* Search",
+                "Greedy",
+                "Hill Climbing",
+                "Sim-Annealing",
+                "Beam Search",
+            ]
             else "",
         ]
 
@@ -640,17 +689,18 @@ def run_game(ROW, COL):
             apply_button.grid(row=3, column=5, padx=5, pady=5)
 
         elif (
-            selected_value == "A*"
-            or selected_value == "IDA*"
+            selected_value == "A* Search"
+            or selected_value == "IDA* Search"
             or selected_value == "Greedy"
             or selected_value == "Hill Climbing"
             or selected_value == "Beam Search"
+            or selected_value == "Sim-Annealing"
         ):
             hamming_rb.grid(row=3, column=6, padx=5, pady=5)
             manhattan_rb.grid(row=3, column=3, padx=5, pady=5)
             linear_conflict_rb.grid(row=3, column=5, padx=5, pady=5)
             misplaced_tiles_rb.grid(row=3, column=4, padx=5, pady=5)
-            if selected_value == "Hill Climbing":
+            if selected_value == "Hill Climbing" or selected_value == "Sim-Annealing":
                 shuffling_count = 0
                 shuffling_count_header_label.grid(row=1, column=4, padx=30, pady=10)
                 shuffling_count_label.grid(row=2, column=4, pady=10)
@@ -670,10 +720,11 @@ def run_game(ROW, COL):
             "IDDFS": iddfs_solve,
             "UCS": ucs_solve,
             "Greedy": greedy_solve,
-            "A*": A_solve,
-            "IDA*": IDA_solve,
-            "Bi-Search": bidirectional_solve,
+            "A* Search": A_solve,
+            "IDA* Search": IDA_solve,
+            "Bidirectional": bidirectional_solve,
             "Hill Climbing": hc_loop,
+            "Sim-Annealing": sa_loop,
             "Beam Search": beam_solve,
         }
         selected_algorithm = algorithm_combobox.get()
@@ -917,14 +968,15 @@ def run_game(ROW, COL):
             "IDDFS",
             "UCS",
             "Greedy",
-            "A*",
-            "IDA*",
-            "Bi-Search",
+            "A* Search",
+            "IDA* Search",
+            "Bidirectional",
             "Hill Climbing",
+            "Sim-Annealing",
             "Beam Search",
         ],
     )
-    algorithm_combobox.configure(width=11, font=("Helvetica", 20), height=20)
+    algorithm_combobox.configure(width=11, font=("Helvetica", 17), height=20)
     algorithm_combobox.set("BFS")
     algorithm_combobox.state(["readonly"])
     algorithm_combobox.bind("<<ComboboxSelected>>", on_combobox_change)
