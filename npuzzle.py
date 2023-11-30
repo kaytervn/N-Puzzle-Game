@@ -269,8 +269,8 @@ def run_game(ROW, COL):
         for i in range(ROW):
             for j in range(COL):
                 if puzzle[i * COL + j] != 0:
-                    correct_row = (puzzle[i * COL + j] - 1) // COL
-                    correct_col = (puzzle[i * COL + j] - 1) % COL
+                    correct_row = (puzzle[i * COL + j]) // COL
+                    correct_col = (puzzle[i * COL + j]) % COL
                     distance += abs(i - correct_row) + abs(j - correct_col)
         return distance
 
