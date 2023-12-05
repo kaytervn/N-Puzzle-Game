@@ -1,46 +1,4 @@
-﻿![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.001.png)TRƯỜNG ĐH SƯ PHẠM KỸ THUẬT TP. HỒ CHÍ MINH
-
-KHOA CÔNG NGHỆ THÔNG TIN
-
-![Logo
-
-Description automatically generated](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.002.png)
-
-**BÁO CÁO CUỐI KỲ**
-
-**Môn học: ĐỒ ÁN CÔNG NGHỆ THÔNG TIN**
-
-**Tên đề tài:**
-
-**THIẾT KẾ VÀ CÀI ĐẶT TRÒ CHƠI N PUZZLE**
-
-**SỬ DỤNG CÁC THUẬT TOÁN AI**
-
-**Giảng viên hướng dẫn:** Lê Văn Vinh
-
-**Danh sách sinh viên thực hiện:**
-
-|**MSSV**|**Họ và tên**|<p>**Tỉ lệ**</p><p>**hoàn thành (%)**</p>|
-| :- | :- | :- |
-|21110335|Nguyễn Trần Văn Trung|100%|
-|21110332|Kiến Đức Trọng|100%|
-
-
-
-
-
-
-
-
-
-
-
-
-
-*TP. Hồ Chí Minh, tháng 11 năm 2023.*
-\*
-
-# **MỤC LỤC**
+﻿# **MỤC LỤC**
 [**I. MỞ ĐẦU**	1](#_toc152321443)
 
 `       `[1. Lý do chọn đề tài**	1](#_toc152321444)**
@@ -261,10 +219,6 @@ Thiết kế trò chơi N puzzle trong dự án lần này ứng dụng được
 # <a name="_toc152321454"></a>**2.1.1.1 BFS (Breadth-First Search)**
 “Tìm kiếm theo chiều rộng (BFS) là một thuật toán để duyệt đồ thị hoặc cây. BFS sử dụng cấu trúc dữ liệu hàng đợi (queue) để tìm đường đi ngắn nhất trong biểu đồ.”[^1]
 
-Thuật toán sử dụng một cấu trúc dữ liệu hàng đợi để lưu trữ thông tin trung gian thu được trong quá trình tìm kiếm:
-
-|<p>Chèn đỉnh gốc vào hàng đợi (đang hướng tới)</p><p>Lấy ra đỉnh đầu tiên trong hàng đợi và quan sát nó</p><p>Nếu đỉnh này chính là đỉnh đích, dừng quá trình tìm kiếm và trả về kết quả.</p><p>Nếu không phải thì chèn tất cả các đỉnh kề với đỉnh vừa thăm nhưng chưa được quan sát trước đó vào hàng đợi.</p><p>Nếu hàng đợi là rỗng, thì tất cả các đỉnh có thể đến được đều đã được quan sát – dừng việc tìm kiếm và trả về "không thấy".</p><p>Nếu hàng đợi không rỗng thì quay về bước 2.</p>|
-| - |
 # <a name="_toc152321455"></a>**2.1.1.2 DFS (Depth-First Search)**
 “Tìm kiếm theo chiều sâu (DFS) là một thuật toán để duyệt qua hoặc tìm kiếm cấu trúc dữ liệu dạng cây hoặc đồ thị. Thuật toán bắt đầu tại nút gốc (chọn một số nút tùy ý làm nút gốc trong trường hợp đồ thị) và kiểm tra từng nhánh càng xa càng tốt trước khi quay lui. Để thực hiện duyệt theo DFS, chúng ta cần sử dụng cấu trúc dữ liệu ngăn xếp có kích thước tối đa bằng tổng số đỉnh trong biểu đồ.”[^2]
 
@@ -321,7 +275,7 @@ Hàm possible\_moves() này ứng dụng trong hầu hết các thuật toán, t
 # <a name="_toc152321471"></a>**1.2 Các hàm ước lượng chi phí Heuristic**
 Các hàm ước lượng chi phí này dùng để cài đặt cho các thuật toán tìm kiếm có thông tin và các tìm kiếm cục bộ.
 # <a name="_toc152321472"></a>**1.2.1 Khoảng cách Manhattan**
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.003.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.003.png)
 
 Là khoảng cách giữa hai điểm trên mặt phẳng theo dạng "đường đi chấm dứt", tức là chỉ di chuyển theo các hướng ngang và dọc, không cho phép di chuyển theo đường chéo.
 
@@ -521,17 +475,17 @@ Beam Search có thể bị kẹt lại ở giải pháp cục bộ nếu không 
 # <a name="_toc152321495"></a>**1.1 Tùy chỉnh kích thước của trò chơi**
 Ta có thể thay đổi kích thước số hàng và số cột (giới hạn từ 2 đến 6) của Puzzle để tạo ra nhiều kích thước khác nhau.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.004.png) **![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.005.png)**
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.004.png) **![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.005.png)**
 # <a name="_toc152321496"></a>**1.2 Hướng dẫn sử dụng**
 Giao diện của trò chơi ứng dụng.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.006.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.006.png)
 # <a name="_toc152321497"></a>**1.2.1 Thông số biểu diễn**
 Thông số để theo dõi gồm số bước, thời gian giải, số trạng thái đã duyệt qua. Ngoài ra còn có độ sâu và số lần xáo trộn ngẫu nhiên tùy theo từng thuật toán được lựa chọn.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.007.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.007.png)
 # <a name="_toc152321498"></a>**1.2.2 Các nút điều khiển**
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.008.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.008.png)
 
 - **Save và Export:** Lưu và xuất trạng thái, dùng để lưu một trạng thái ngẫu nhiên và xuất trạng thái đó để theo dõi và so sánh được nhiều thuật toán trên cùng một trạng thái.
 - **Change size:** Thay đổi kích thước N, khi nhấn vào sẽ quay lại giao diện chọn kích thước ban đầu.
@@ -544,21 +498,21 @@ Thông số để theo dõi gồm số bước, thời gian giải, số trạng
 # <a name="_toc152321499"></a>**1.2.3 Các ô số**
 Người dùng có thể chọn vào các ô số để di chuyển, giải quyết bài toán. Ngoài ra, có thể sử dụng tính năng chèn hình thay đổi giao diện của các ô số.
 
-- ![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.009.png) **![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.010.png)**
+- ![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.009.png) **![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.010.png)**
 # <a name="_toc152321500"></a>**1.2.3 Lịch sử các bản ghi đã giải**
 `	`Bản ghi lưu lại những thông số biểu diễn trước đó để dễ theo dõi và đánh giá. Những thuật toán nào đã giải được sẽ hiện màu đen, ngược lại sẽ hiện màu đỏ.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.011.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.011.png)
 # <a name="_toc152321501"></a>**2. Đánh giá, phân tích kết quả**
 # <a name="_toc152321502"></a>**2.1 Ghi chú**
 # <a name="_toc152321503"></a>**2.1.1 Lựa chọn ước lượng độ dài Manhattan**
 Đối với các hàm Heuristic, nhận thấy rằng khoảng cách Manhattan là tối ưu nhất (duyệt ít trạng thái nhất) nên chúng tôi quyết định lựa chọn ước lượng này cho mọi thuật toán tìm kiếm có thông tin và tìm kiểm cục bộ.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.012.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.012.png)
 # <a name="_toc152321504"></a>**2.1.2 Hill Climbing và Simulated Annealing**
 Đối với thuật toán Hill Climbing và Simulated Annealing: thuật toán cho phép xáo trộn ngẫu nhiên lại trạng thái ban đầu hoàn hảo nhất cho việc tìm kiếm lời giải nên không dùng để so sánh.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.013.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.013.png)
 
 Ngoài ra, chúng tôi đánh giá rằng Simulated Annealing có xu hướng duyệt nhiều trạng thái hơn và số lần xáo trộn ngẫu nhiên để tìm lời giải cũng sẽ ít hơn so với Hill Climbing vì nó có xác suất chấp nhận chuyển sang trạng thái xấu hơn kỹ thuật giảm nhiệt độ.
 
@@ -566,7 +520,7 @@ Ngoài ra, chúng tôi đánh giá rằng Simulated Annealing có xu hướng du
 # <a name="_toc152321505"></a>**2.1.3 Đánh giá theo kích thước của bài toán**
 Đối với các kích thước nhỏ như 2x2, 2x3, 3x2: Tất cả các thuật toán đều giải quyết được bài toán với thời gian chạy là 0.00s với cùng 1 trạng thái bắt đầu. Vì vậy, chưa có cơ sở để phân tích đánh giá.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.014.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.014.png)
 
 Còn đối với các kích thước lớn hơn 3x3, các thuật toán biểu diễn được thông số thời gian và số trạng thái duyệt được lập trình theo kỹ thuật chia luồng. Tuy nhiên, giải thuật tìm kiếm rất lâu và chỉ có một số thuật toán giải được nên cũng không có cơ sở đánh giá được nhiều.
 
@@ -574,15 +528,15 @@ Vì vậy, chúng tôi sẽ tập trung đánh giá độ hiệu quả thuật t
 # <a name="_toc152321506"></a>**2.2 So sánh, đánh giá dựa trên kích thước 3x3**
 Trạng thái ngẫu nhiên được so sánh:
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.015.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.015.png)
 
 
 
 Các bản ghi được lưu lại.
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.016.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.016.png)
 
-![](Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.017.png)
+![](/images/Aspose.Words.a201f1dd-7840-4853-9529-80330e22afe8.017.png)
 
 `	`Ta thấy các thuật toán đã đưa ra được lời giải tối ưu với số bước đi ngắn nhất là BFS, UCS, A\*, Beam Search, và Bi-Search. Ở đây có Beam Search là tìm kiếm cục bộ nhưng vẫn tìm ra được lời giải tối ưu do nó có cơ chế duyệt qua các trạng thái tiềm năng và lựa chọn một số lượng hữu hạn các trạng thái tốt nhất để mở rộng tiếp tục tìm kiếm.
 
