@@ -1,5 +1,6 @@
-<embed src="N2_KienDucTrong_NguyenTranVanTrung.pdf" type="application/pdf" width="100%" height="600px" />
-
+<object data="/N2_KienDucTrong_NguyenTranVanTrung.pdf" type="application/pdf" width="100%" height="600px">
+    <p>Trình duyệt của bạn không hỗ trợ xem PDF. Bạn có thể <a href="/N2_KienDucTrong_NguyenTranVanTrung.pdf">tải xuống tệp tin ở đây</a> thay vì xem nó trực tuyến.</p>
+</object>
  
  # <a name="_toc152321443"></a>**I. MỞ ĐẦU**
 
