@@ -1,4 +1,7 @@
-﻿# <a name="_toc152321443"></a>**I. MỞ ĐẦU**
+<embed src="N2_KienDucTrong_NguyenTranVanTrung.pdf" type="application/pdf" width="100%" height="600px" />
+
+ 
+ # <a name="_toc152321443"></a>**I. MỞ ĐẦU**
 
 # <a name="_toc152321444"></a>**1. Lý do chọn đề tài**
 
